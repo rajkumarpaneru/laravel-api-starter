@@ -40,6 +40,15 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
         $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['Invalid credentials.'], 402);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['Invalid credentials.'], 402);
+        }
+
         $token = $user->createToken('api');
 
         return response()->json(['data' => [
