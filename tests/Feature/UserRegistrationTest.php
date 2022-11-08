@@ -21,8 +21,16 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super-secret',
         ]);
 
-        $response->assertOk();
         $this->assertCount(1, User::all());
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'id' => 1,
+                    'name' => 'first_user',
+                    'email' => 'first_user@example.net',
+                ]
+            ]);
     }
 
     /** @test */
@@ -35,7 +43,14 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super-secret',
         ]);
 
-        $response->assertSessionHasErrors();
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'name' => 'The name field is required.',
+                ]
+            ]);
 
     }
 
@@ -49,7 +64,14 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super-secret',
         ]);
 
-        $response->assertSessionHasErrors();
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'email' => 'The email field is required.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -61,8 +83,14 @@ class UserRegistrationTest extends TestCase
             'password' => 'super-secret',
             'password_confirmation' => 'super-secret',
         ]);
+        $this->assertCount(0, User::all());
 
-        $response->assertSessionHasErrors();
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'email' => 'The email must be a valid email address.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -82,7 +110,12 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super-secret',
         ]);
 
-        $response->assertSessionHasErrors();
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'email' => 'The email has already been taken.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -95,7 +128,14 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super-secret',
         ]);
 
-        $response->assertSessionHasErrors();
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'password' => 'The password field is required.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -108,7 +148,14 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super',
         ]);
 
-        $response->assertSessionHasErrors();
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'password' => 'The password must be at least 8 characters.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -121,7 +168,14 @@ class UserRegistrationTest extends TestCase
             'password_confirmation' => 'super',
         ]);
 
-        $response->assertSessionHasErrors();
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'password' => 'The password confirmation does not match.',
+                ]
+            ]);
     }
 
     /** @test */
@@ -135,7 +189,7 @@ class UserRegistrationTest extends TestCase
         ]);
 
         $hash = Hash::check('super-secret', User::first()->password);
-        $this->assertEquals( true, $hash);
+        $this->assertEquals(true, $hash);
     }
 
 }

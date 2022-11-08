@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,5 +47,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof ValidationException) {
+            $errors = $exception->validator->errors();
+            $messages = [];
+            foreach ($errors->messages() as $key => $message) {
+                $messages[$key] = $message[0];
+            }
+            return response()->json([
+                'errors' => $messages,
+            ], 422);
+        }
+
+        return parent::render($request, $exception);
     }
 }
