@@ -32,4 +32,14 @@ class AuthController extends Controller
         ]);
 
     }
+
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        $token = $user->createToken('api');
+
+        return response()->json(['data' => [
+            'token' => $token->plainTextToken,
+        ]]);
+    }
 }
