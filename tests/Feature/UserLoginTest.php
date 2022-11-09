@@ -30,6 +30,12 @@ class UserLoginTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertArrayHasKey('token', $response['data']);
+
+        $response->assertJsonFragment([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
     }
 
     /** @test */
