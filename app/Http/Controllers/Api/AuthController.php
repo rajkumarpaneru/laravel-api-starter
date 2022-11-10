@@ -71,4 +71,24 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    public function updateUserProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+        ]);
+        $user = $request->user();
+
+        $user->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
+    }
 }

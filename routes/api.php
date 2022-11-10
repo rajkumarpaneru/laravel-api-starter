@@ -10,3 +10,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/user-profile', [AuthController::class, 'showUserProfile'])
     ->middleware('auth:sanctum');
 
+Route::put('/user-profile', [AuthController::class, 'updateUserProfile'])
+    ->middleware('auth:sanctum');
+
