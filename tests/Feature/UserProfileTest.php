@@ -20,7 +20,7 @@ class UserProfileTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->get('/api/user-profile');
+        $response = $this->getJson('/api/user-profile');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -31,5 +31,16 @@ class UserProfileTest extends TestCase
                 ]
             ]);
 
+    }
+
+    /** @test */
+    public function a_user_get_401_unauthenticated_if_not_logged_in()
+    {
+        $response = $this->getJson('/api/user-profile');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => "Unauthenticated."
+            ]);
     }
 }
