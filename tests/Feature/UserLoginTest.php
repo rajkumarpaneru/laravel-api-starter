@@ -22,7 +22,7 @@ class UserLoginTest extends TestCase
             'password' => Hash::make('my-password'),
         ]);
 
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'my-password',
         ]);
@@ -41,7 +41,7 @@ class UserLoginTest extends TestCase
     /** @test */
     public function an_email_is_required()
     {
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => '',
         ]);
 
@@ -57,7 +57,7 @@ class UserLoginTest extends TestCase
     public function an_email_is_a_valid_email()
     {
 //        $this->withoutExceptionHandling();
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'not_valid_email',
         ]);
 
@@ -74,7 +74,7 @@ class UserLoginTest extends TestCase
     {
 //        $this->withoutExceptionHandling();
         $user = User::factory()->create();
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
         ]);
 
@@ -91,7 +91,7 @@ class UserLoginTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $user = User::factory()->create();
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'secret-123',
         ]);
@@ -106,7 +106,7 @@ class UserLoginTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $user = User::factory()->create();
-        $response = $this->post('/api/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'not_a_user_email@example.com',
             'password' => 'secret-123',
         ]);

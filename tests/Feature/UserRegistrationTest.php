@@ -14,7 +14,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_user_can_be_added_by_registration()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
@@ -36,7 +36,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_name_is_required()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => '',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
@@ -57,7 +57,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_required()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => '',
             'password' => 'super-secret',
@@ -77,7 +77,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_a_valid_email()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user.com',
             'password' => 'super-secret',
@@ -96,7 +96,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_unique_among_users()
     {
-        $this->post('/api/register', [
+        $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
@@ -121,7 +121,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_is_required()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => '',
@@ -141,7 +141,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_is_at_least_eight_character_long()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super',
@@ -161,7 +161,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_must_be_confirmed()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
@@ -181,7 +181,7 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function hashed_password_is_stored_in_database()
     {
-        $response = $this->post('/api/register', [
+        $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
