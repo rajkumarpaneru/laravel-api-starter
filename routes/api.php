@@ -13,3 +13,6 @@ Route::get('/user-profile', [AuthController::class, 'showUserProfile'])
 Route::put('/user-profile', [AuthController::class, 'updateUserProfile'])
     ->middleware('auth:sanctum');
 
+Route::post('/password-change', [AuthController::class, 'changePassword'])
+    ->middleware('auth:sanctum');
+
