@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordResetMail;
+use App\Mail\StudentEnrolledMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -110,5 +113,10 @@ class AuthController extends Controller
                 'email' => $user->email,
             ]
         ]);
+    }
+
+    public function sendPasswordResetEmail(Request $request)
+    {
+        Mail::to($request->email)->send(new PasswordResetMail());
     }
 }

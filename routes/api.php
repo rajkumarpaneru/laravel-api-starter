@@ -16,3 +16,5 @@ Route::put('/user-profile', [AuthController::class, 'updateUserProfile'])
 Route::post('/password-change', [AuthController::class, 'changePassword'])
     ->middleware('auth:sanctum');
 
+Route::post('/password-reset-email', [AuthController::class, 'sendPasswordResetEmail']);
+
