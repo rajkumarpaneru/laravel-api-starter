@@ -6,6 +6,7 @@ use App\Mail\PasswordResetMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -16,21 +17,33 @@ class PasswordResetTest extends TestCase
     /** @test */
     public function a_user_can_request_password_reset_link()
     {
-//        $this->withoutExceptionHandling();
+        $this->withoutExceptionHandling();
+        Mail::fake();
 
         $user = User::factory()->create();
+
         $response = $this->postJson('/api/password-reset-email', [
             'email' => $user->email,
         ]);
 
-        Mail::fake();
 //        Mail::assertNothingSent();
-        $mail = new PasswordResetMail();
+//        $mail = new PasswordResetMail();
 //        Mail::to('new_email@mail.com')->send(new PasswordResetMail());
-//        Mail::assertSent(PasswordResetMail::class);
+//        $response->assertStatus(200);
+        Mail::assertSent(PasswordResetMail::class);
 //        , function ($mail) use ($user) {
 //            $mail->hasTo($user);
 //        });
-        $response->assertStatus(200);
+//        $response->assertStatus(200);
+
+
+        // Arrange
+//        Mail::fake();
+
+//        $mailable = new class() extends Mailable {};
+
+        // Act (can be a model action or something)
+//        $sent = Mail::to('text@example.com')->send(PasswordResetMail::class);
+//        Mail::assertSent(PasswordResetMail::class);
     }
 }
