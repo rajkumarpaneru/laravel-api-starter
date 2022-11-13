@@ -14,14 +14,19 @@ class PasswordResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $reset_link;
+
+    public $token;
+
     /**
      * Create a new message instance.
      *
-     * @return void
+     * @param $token
      */
-    public function __construct()
+    public function __construct($token)
     {
-        //
+        $this->reset_link = 'some_link' . $token;
+        $this->token = $token;
     }
 
     /**
