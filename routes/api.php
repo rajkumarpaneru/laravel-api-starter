@@ -18,3 +18,5 @@ Route::post('/password-change', [AuthController::class, 'changePassword'])
 
 Route::post('/password-reset-email', [AuthController::class, 'sendPasswordResetEmail']);
 
+Route::post('/password-reset', [AuthController::class, 'resetPassword']);
+

@@ -126,4 +126,11 @@ class AuthController extends Controller
 
         Mail::to($request->email)->send(new PasswordResetMail($token));
     }
+
+    public function resetPassword(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+    }
 }

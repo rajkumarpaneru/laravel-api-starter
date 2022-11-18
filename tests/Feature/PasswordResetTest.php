@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -62,5 +63,27 @@ class PasswordResetTest extends TestCase
         $mailable->assertFrom('jeffrey@example.com');
         $mailable->assertHasSubject('Password Reset Link');
         $mailable->assertSeeInHtml($password_resets_row->token);
+    }
+
+    /** @test */
+    public function user_can_reset_password_with_password_reset_token()
+    {
+//        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+        $user->password = Hash::make('old-password');
+        $user->save();
+
+        $response = $this->postJson('/api/password-reset', [
+            'token' => '123456',
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        $hash = Hash::check('new-password', $user->password);
+        $this->assertEquals(true, $hash);
+
+        $response->assertStatus(200);
     }
 }
