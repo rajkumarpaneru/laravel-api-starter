@@ -129,12 +129,16 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
         $user = User::where('email', $request->email)->firstOrFail();
         $user->password = Hash::make($request->password);
         $user->save();
 
         return response()->json([
-            'status' => 'success',
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
