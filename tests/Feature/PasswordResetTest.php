@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -68,7 +69,7 @@ class PasswordResetTest extends TestCase
     /** @test */
     public function user_can_reset_password_with_password_reset_token()
     {
-//        $this->withoutExceptionHandling();
+        $this->withoutExceptionHandling();
 
         $user = User::factory()->create();
         $user->password = Hash::make('old-password');
@@ -81,9 +82,7 @@ class PasswordResetTest extends TestCase
             'password_confirmation' => 'new-password',
         ]);
 
-        $hash = Hash::check('new-password', $user->password);
+        $hash = Hash::check('new-password', $user->fresh()->password);
         $this->assertEquals(true, $hash);
-
-        $response->assertStatus(200);
     }
 }
