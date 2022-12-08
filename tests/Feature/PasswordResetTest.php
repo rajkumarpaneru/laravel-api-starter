@@ -69,7 +69,7 @@ class PasswordResetTest extends TestCase
     /** @test */
     public function user_can_reset_password_with_password_reset_token()
     {
-        $this->withoutExceptionHandling();
+//        $this->withoutExceptionHandling();
 
         $user = User::factory()->create();
         $user->password = Hash::make('old-password');
@@ -208,7 +208,6 @@ class PasswordResetTest extends TestCase
             ]);
     }
 
-
     /** @test */
     public function a_token_is_required()
     {
@@ -223,10 +222,39 @@ class PasswordResetTest extends TestCase
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
         ]);
+
         $response->assertStatus(422)
             ->assertJson([
                 'errors' => [
                     'token' => 'The token field is required.',
+                ]
+            ]);
+    }
+
+    /** @test */
+    public function a_token_must_be_a_valid_token()
+    {
+//        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+        $user->password = Hash::make('old-password');
+        $user->save();
+
+        $response = $this->postJson('/api/password-reset', [
+            'token' => '123456', //invalid_token
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        //password is not updated with invalid token
+//        $hash = Hash::check('old-password', $user->fresh()->password);
+//        $this->assertEquals(true, $hash);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'token' => 'The token is invalid.',
                 ]
             ]);
     }

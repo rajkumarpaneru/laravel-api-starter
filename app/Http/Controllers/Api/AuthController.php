@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Mail\PasswordResetMail;
 use App\Models\User;
+use App\Rules\TokenIsValid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -127,13 +129,8 @@ class AuthController extends Controller
         Mail::to($request->email)->send(new PasswordResetMail($token));
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:8',
-        ]);
         $user = User::where('email', $request->email)->firstOrFail();
         $user->password = Hash::make($request->password);
         $user->save();
