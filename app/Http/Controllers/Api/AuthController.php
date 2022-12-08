@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Mail\PasswordResetMail;
 use App\Models\User;
-use App\Rules\TokenIsValid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -134,6 +133,8 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->firstOrFail();
         $user->password = Hash::make($request->password);
         $user->save();
+
+        DB::table('password_resets')->where('email', $request->email)->delete();
 
         return response()->json([
             'data' => [

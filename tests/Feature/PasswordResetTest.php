@@ -95,6 +95,9 @@ class PasswordResetTest extends TestCase
         $hash = Hash::check('new-password', $user->fresh()->password);
         $this->assertEquals(true, $hash);
 
+        //password-reset token is deleted from db
+        $this->assertCount(0, DB::table('password_resets')->get());
+
         $response->assertStatus(200)
             ->assertJson([
                 'data' => [
