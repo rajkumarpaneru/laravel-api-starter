@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -75,8 +76,17 @@ class PasswordResetTest extends TestCase
         $user->password = Hash::make('old-password');
         $user->save();
 
+        //add password-reset token to db
+        $token = Str::random();
+        DB::table('password_resets')
+            ->insert([
+                'email' => $user->email,
+                'token' => Hash::make($token),
+                'created_at' => now(),
+            ]);
+
         $response = $this->postJson('/api/password-reset', [
-            'token' => '123456',
+            'token' => $token,
             'email' => $user->email,
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
@@ -248,8 +258,8 @@ class PasswordResetTest extends TestCase
         ]);
 
         //password is not updated with invalid token
-//        $hash = Hash::check('old-password', $user->fresh()->password);
-//        $this->assertEquals(true, $hash);
+        $hash = Hash::check('old-password', $user->fresh()->password);
+        $this->assertEquals(true, $hash);
 
         $response->assertStatus(422)
             ->assertJson([
