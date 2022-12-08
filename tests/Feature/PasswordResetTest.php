@@ -30,17 +30,21 @@ class PasswordResetTest extends TestCase
             'email' => $user->email,
         ]);
 
-        Mail::assertSent(PasswordResetMail::class);
-//            , function ($mail) use ($user) {
-//                $mail->hasTo($user);
-//            });
+        //password-reset token is deleted from db
+        $this->assertCount(1, DB::table('password_resets')->get());
 
         // Assert a message was sent to given email addresses
         Mail::assertSent(PasswordResetMail::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email) &&
-                $mail->hasFrom('jeffrey@example.com');
+                $mail->hasFrom(config('mail.from.address'));
         });
-        $response->assertStatus(200);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'message' => 'Password reset link successfully sent.',
+                ]
+            ]);
     }
 
     /** @test */

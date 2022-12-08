@@ -122,10 +122,17 @@ class AuthController extends Controller
         $token = Str::random();
         DB::table('password_resets')->insert([
             'email' => $request->email,
-            'token' => $token
+            'token' => $token,
+            'created_at' => now(),
         ]);
 
         Mail::to($request->email)->send(new PasswordResetMail($token));
+
+        return response()->json([
+            'data' => [
+                'message' => 'Password reset link successfully sent.',
+            ]
+        ]);
     }
 
     public function resetPassword(ResetPasswordRequest $request)

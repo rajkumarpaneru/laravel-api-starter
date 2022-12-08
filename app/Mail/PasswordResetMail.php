@@ -37,7 +37,7 @@ class PasswordResetMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            from: new Address('jeffrey@example.com', 'Jeffrey Way'),
+            from: new Address(config('mail.from.address'), config('mail.from.name')),
         subject: 'Password Reset Link',
         );
     }
