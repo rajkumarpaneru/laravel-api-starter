@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\UpdateUserProfileRequest;
 use App\Mail\PasswordResetMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,14 +18,8 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -38,12 +36,8 @@ class AuthController extends Controller
 
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -77,11 +71,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function updateUserProfile(Request $request)
+    public function updateUserProfile(UpdateUserProfileRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
         $user = $request->user();
 
         $user->update([
@@ -97,13 +88,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
-        $request->validate([
-            'old_password' => 'required',
-            'password' => 'required|confirmed|min:8'
-        ]);
-
         $user = $request->user();
 
         $user->password = Hash::make($request->password);
