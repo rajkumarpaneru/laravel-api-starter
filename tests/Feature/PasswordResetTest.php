@@ -66,7 +66,7 @@ class PasswordResetTest extends TestCase
         $password_resets_row = DB::table('password_resets')->first();
 
         $mailable = new PasswordResetMail($password_resets_row->token);
-        $mailable->assertFrom('jeffrey@example.com');
+        $mailable->assertFrom(config('mail.from.address'));
         $mailable->assertHasSubject('Password Reset Link');
         $mailable->assertSeeInHtml($password_resets_row->token);
     }
