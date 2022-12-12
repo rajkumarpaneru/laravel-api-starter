@@ -96,6 +96,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'frontend_url' => env('FRONTEND_URL', 'frontend@example.com'),
     /*
     |--------------------------------------------------------------------------
     | Markdown Mail Settings

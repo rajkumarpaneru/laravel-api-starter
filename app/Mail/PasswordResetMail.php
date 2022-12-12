@@ -18,15 +18,16 @@ class PasswordResetMail extends Mailable
 
     public $token;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param $token
-     */
-    public function __construct($token)
+    public $sender_name;
+
+    public $email;
+
+    public function __construct($token, $email)
     {
-        $this->reset_link = 'some_link' . $token;
+        $this->reset_link = config('mail.frontend_url') . '.' . $token . '/password/reset?email=' . $email;
         $this->token = $token;
+        $this->sender_name = config('mail.from.name');
+        $this->email = $email;
     }
 
     /**

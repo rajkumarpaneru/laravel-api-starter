@@ -1,21 +1,44 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Password Reset Link</title>
+    <title>Reset Your Password!!</title>
+    <style>
+        body {
+            margin: 50px;
+            background-color: lightgray;
+        }
+
+        .main-div {
+            width: 1000px;
+            background-color: white;
+            padding: 50px;
+        }
+
+        .link {
+            justify-content: center;
+            background-color: rgb(95, 95, 227);
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px;
+        }
+
+        p {
+            color: rgb(100, 100, 100);
+        }
+    </style>
 </head>
 <body>
-<strong>Hello!</strong>
-<p>You are receiving this email because we received a password reset request for your account.</p>
-<a href="{{$reset_link}}">Reset Password</a>
-<p>This password reset link will be expired in 60 minutes.</p>
-<p>If you did not request a password reset, no further action is required.</p>
-<p>Regards,</p>
-<p>Laravel</p>
-<p>If you're having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser: {{$reset_link}}</p>
-
+<div class="main-div">
+    <strong>Hello!</strong>
+    <p>You are receiving this email because we received a password reset request for your account.</p>
+    <a class="link" href="{{$reset_link}}">Reset Password</a>
+    <p>This password reset link will be expired in 60 minutes.</p>
+    <p>If you did not request a password reset, no further action is required.</p>
+    <p>Regards,</p>
+    <p>{{$sender_name}}</p>
+    <p>If you're having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser: <a href="{{$reset_link}}">{{$reset_link}}</a>.</p>
+</div>
 </body>
 </html>

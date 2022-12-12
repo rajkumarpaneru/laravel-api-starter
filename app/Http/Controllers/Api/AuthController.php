@@ -112,7 +112,7 @@ class AuthController extends Controller
             'created_at' => now(),
         ]);
 
-        Mail::to($request->email)->send(new PasswordResetMail($token));
+        Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
 
         return response()->json([
             'data' => [
