@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Mail\VerifyEmailMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class UserRegistrationTest extends TestCase
@@ -14,12 +16,20 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_user_can_be_added_by_registration()
     {
+        $this->withoutExceptionHandling();
+        Mail::fake();
         $response = $this->postJson('/api/register', [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
             'password_confirmation' => 'super-secret',
         ]);
+
+        // Assert a message was sent to given email addresses
+        Mail::assertQueued(VerifyEmailMail::class, function ($mail) {
+            return $mail->hasTo('first_user@example.net') &&
+                $mail->hasFrom(config('mail.from.address'));
+        });
 
         $this->assertCount(1, User::all());
 
