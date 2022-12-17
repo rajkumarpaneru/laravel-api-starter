@@ -155,6 +155,25 @@ class UserRegistrationTest extends TestCase
     }
 
     /** @test */
+    public function a_password_confirmation_should_not_be_empty()
+    {
+        $request = array_merge($this->getData(), [
+            'password_confirmation' => '',
+        ]);
+
+        $response = $this->postJson('/api/register', $request);
+
+        $this->assertCount(0, User::all());
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'password' => 'The password confirmation does not match.',
+                ]
+            ]);
+    }
+
+    /** @test */
     public function a_password_must_be_confirmed()
     {
         $request = array_merge($this->getData(), [
