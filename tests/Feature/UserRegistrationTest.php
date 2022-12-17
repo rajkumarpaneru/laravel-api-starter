@@ -18,16 +18,12 @@ class UserRegistrationTest extends TestCase
     {
         $this->withoutExceptionHandling();
         Mail::fake();
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
-            'email' => 'first_user@example.net',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
-        ]);
+
+        $response = $this->postJson('/api/register', $this->getData());
 
         // Assert a message was sent to given email addresses
-        Mail::assertQueued(VerifyEmailMail::class, function ($mail) {
-            return $mail->hasTo('first_user@example.net') &&
+        Mail::assertQueued(VerifyEmailMail::class, function ($mail) use ($request) {
+            return $mail->hasTo($request['email']) &&
                 $mail->hasFrom(config('mail.from.address'));
         });
 
@@ -37,8 +33,8 @@ class UserRegistrationTest extends TestCase
             ->assertJson([
                 'data' => [
                     'id' => 1,
-                    'name' => 'first_user',
-                    'email' => 'first_user@example.net',
+                    'name' => $request['name'],
+                    'email' => $request['email'],
                 ]
             ]);
     }
@@ -46,12 +42,11 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_name_is_required()
     {
-        $response = $this->postJson('/api/register', [
+        $request = array_merge($this->getData(), [
             'name' => '',
-            'email' => 'first_user@example.net',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
         ]);
+
+        $response = $this->postJson('/api/register', $request);
 
         $this->assertCount(0, User::all());
 
@@ -67,12 +62,11 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_required()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
+        $request = array_merge($this->getData(), [
             'email' => '',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
         ]);
+
+        $response = $this->postJson('/api/register', $request);
 
         $this->assertCount(0, User::all());
 
@@ -87,12 +81,10 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_a_valid_email()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
+        $request = array_merge($this->getData(), [
             'email' => 'first_user.com',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
         ]);
+        $response = $this->postJson('/api/register', $request);
         $this->assertCount(0, User::all());
 
         $response->assertStatus(422)
@@ -106,19 +98,16 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function an_email_is_unique_among_users()
     {
-        $this->postJson('/api/register', [
-            'name' => 'first_user',
-            'email' => 'first_user@example.net',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
+        $request1 = $this->getData();
+        $this->postJson('/api/register', $request1);
+
+        $request2 = array_merge($request1, [
+            'name' => 'second_user',
+            'password' => 'second-user',
+            'password_confirmation' => 'second-user',
         ]);
 
-        $response = $this->post('/api/register', [
-            'name' => 'second_user',
-            'email' => 'first_user@example.net',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super-secret',
-        ]);
+        $response = $this->postJson('/api/register', $request2);
 
         $response->assertStatus(422)
             ->assertJson([
@@ -131,12 +120,10 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_is_required()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
-            'email' => 'first_user@example.net',
+        $request = array_merge($this->getData(), [
             'password' => '',
-            'password_confirmation' => 'super-secret',
         ]);
+        $response = $this->postJson('/api/register', $request);
 
         $this->assertCount(0, User::all());
 
@@ -151,12 +138,11 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_is_at_least_eight_character_long()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
-            'email' => 'first_user@example.net',
-            'password' => 'super',
-            'password_confirmation' => 'super',
+        $request = array_merge($this->getData(), [
+            'password' => '12345',
+            'password_confirmation' => '12345',
         ]);
+        $response = $this->postJson('/api/register', $request);
 
         $this->assertCount(0, User::all());
 
@@ -171,12 +157,11 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function a_password_must_be_confirmed()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'first_user',
-            'email' => 'first_user@example.net',
-            'password' => 'super-secret',
-            'password_confirmation' => 'super',
+        $request = array_merge($this->getData(), [
+            'password_confirmation' => 'new-password',
         ]);
+
+        $response = $this->postJson('/api/register', $request);
 
         $this->assertCount(0, User::all());
 
@@ -191,15 +176,21 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function hashed_password_is_stored_in_database()
     {
-        $response = $this->postJson('/api/register', [
+
+        $this->postJson('/api/register', $this->getData());
+
+        $hash = Hash::check('super-secret', User::first()->password);
+        $this->assertEquals(true, $hash);
+    }
+
+    private function getData()
+    {
+        return [
             'name' => 'first_user',
             'email' => 'first_user@example.net',
             'password' => 'super-secret',
             'password_confirmation' => 'super-secret',
-        ]);
-
-        $hash = Hash::check('super-secret', User::first()->password);
-        $this->assertEquals(true, $hash);
+        ];
     }
 
 }
