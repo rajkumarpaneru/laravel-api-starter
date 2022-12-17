@@ -19,7 +19,8 @@ class UserRegistrationTest extends TestCase
         $this->withoutExceptionHandling();
         Mail::fake();
 
-        $response = $this->postJson('/api/register', $this->getData());
+        $request = $this->getData();
+        $response = $this->postJson('/api/register', $request);
 
         // Assert a message was sent to given email addresses
         Mail::assertQueued(VerifyEmailMail::class, function ($mail) use ($request) {
