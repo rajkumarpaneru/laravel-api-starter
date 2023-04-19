@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateUserProfileRequest;
 use App\Mail\PasswordResetMail;
 use App\Mail\VerifyEmailMail;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
             'name' => $request->name,
@@ -39,7 +40,7 @@ class AuthController extends Controller
 
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
 
@@ -61,7 +62,7 @@ class AuthController extends Controller
         ]]);
     }
 
-    public function showUserProfile(Request $request)
+    public function showUserProfile(Request $request): JsonResponse
     {
         $user = $request->user();
 
@@ -74,7 +75,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function updateUserProfile(UpdateUserProfileRequest $request)
+    public function updateUserProfile(UpdateUserProfileRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -91,7 +92,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function changePassword(ChangePasswordRequest $request)
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -106,7 +107,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function sendPasswordResetEmail(Request $request)
+    public function sendPasswordResetEmail(Request $request): JsonResponse
     {
         $token = Str::random();
         DB::table('password_resets')->insert([
@@ -124,7 +125,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function resetPassword(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->firstOrFail();
         $user->password = Hash::make($request->password);
