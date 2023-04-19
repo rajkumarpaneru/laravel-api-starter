@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -30,14 +30,13 @@ class AuthController extends Controller
 
         Mail::to($request->email)->send(new VerifyEmailMail());
 
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+        $response = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
 
+        return $this->response('User registered successfully.', 200, $response);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -45,34 +44,35 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return response()->json(['Invalid credentials.'], 402);
+            return $this->response('Invalid credentials.', 402);
         }
 
         if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['Invalid credentials.'], 402);
+            return $this->response('Invalid credentials.', 402);
         }
 
         $token = $user->createToken('api');
 
-        return response()->json(['data' => [
+        $response = [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'token' => $token->plainTextToken,
-        ]]);
+        ];
+        return $this->response('User logged in successfully.', 200, $response);
     }
 
     public function showUserProfile(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+        $response = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        return $this->response('Profile retrieved successfully.', 200, $response);
     }
 
     public function updateUserProfile(UpdateUserProfileRequest $request): JsonResponse
@@ -83,13 +83,13 @@ class AuthController extends Controller
             'name' => $request->name,
         ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+        $response = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        return $this->response('Profile updated successfully.', 200, $response);
     }
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
@@ -98,13 +98,14 @@ class AuthController extends Controller
 
         $user->password = Hash::make($request->password);
         $user->save();
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+
+        $response = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        return $this->response('Password changed successfully.', 200, $response);
     }
 
     public function sendPasswordResetEmail(Request $request): JsonResponse
@@ -118,11 +119,7 @@ class AuthController extends Controller
 
         Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
 
-        return response()->json([
-            'data' => [
-                'message' => 'Password reset link successfully sent.',
-            ]
-        ]);
+        return $this->response('Password reset link sent successfully.');
     }
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
@@ -133,12 +130,6 @@ class AuthController extends Controller
 
         DB::table('password_resets')->where('email', $request->email)->delete();
 
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
+        return $this->response('Password is successfully reset.');
     }
 }
